@@ -45,9 +45,10 @@ public class GyroIOReal implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.isConnected =
-        BaseStatusSignal.refreshAll(yaw, pitch, roll, yawVelocity).equals(StatusCode.OK);
+    BaseStatusSignal.refreshAll(yaw, pitch, roll, yawVelocity);
 
+    inputs.isConnected =
+        BaseStatusSignal.isAllGood(yaw, pitch, roll, yawVelocity);
     inputs.yaw = new Rotation2d(yaw.getValue());
     inputs.pitch = new Rotation2d(pitch.getValue());
     inputs.roll = new Rotation2d(roll.getValue());

@@ -7,18 +7,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
@@ -28,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -66,13 +59,32 @@ public class Robot extends LoggedRobot {
     REPLAY
   }
 
-  private Alert manualArmRezeroAlert;
-  private Alert driverJoystickDisconnectedAlert;
-  private Alert operatorJoystickDisconnectedAlert;
+  private final Alert driverJoystickDisconnectedAlert =
+      new Alert("Driver controller disconnected!", AlertType.kError);
+  private final Alert operatorJoystickDisconnectedAlert =
+      new Alert("Operator controller disconnected!", AlertType.kError);
+  private final Alert canErrorAlert =
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+  private final Alert canivoreErrorAlert =
+      new Alert("CANivore errors detected, robot may not be controllable.", AlertType.kError);
+  private final Alert lowBatteryAlert =
+      new Alert(
+          "Battery voltage is very low, consider turning off the robot or replacing the battery.",
+          AlertType.kWarning);
 
   private static CANBus canivore = new CANBus("*");
 
-  private static CANBusStatus canivoreStatus = canivore.getStatus();
+  private final Timer canInitialErrorTimer = new Timer();
+  private final Timer canErrorTimer = new Timer();
+  private final Timer canivoreErrorTimer = new Timer();
+  private final Timer disabledTimer = new Timer();
+  private static final double CAN_ERROR_TIME_THRESHOLD = 0.5; // Seconds to disable alert
+  private static final double CANIVORE_ERROR_TIME_THRESHOLD = 0.5;
+
+  private static int lowBatteryCycleCount = 0;
+  private static final double lowBatteryVoltage = 11.8; // TODO tune
+  private static final double lowBatteryDisabledTime = 1.5;
+  private static final double lowBatteryMinCycleCount = 10;
 
   // Instantiate subsystems
 
@@ -80,7 +92,6 @@ public class Robot extends LoggedRobot {
   private final DriveTrainSimulationConfig driveTrainSimConfig =
       DriveTrainSimulationConfig.Default()
           .withGyro(COTS.ofPigeon2())
-          // TODO: MAKE SURE THIS MODULE IS CORRECT
           .withSwerveModule(
               COTS.ofMark4n(
                   DCMotor.getKrakenX60Foc(1),
@@ -171,7 +182,7 @@ public class Robot extends LoggedRobot {
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
     // be added.
 
-    Logger.recordOutput("Canivore Status", canivoreStatus.Status);
+    Logger.recordOutput("Canivore Status", canivore.getStatus().Status);
 
     PhoenixOdometryThread.getInstance().start();
 
@@ -198,7 +209,7 @@ public class Robot extends LoggedRobot {
 
     addControllerBindings();
 
-    autos = new Autos(swerve, superstructure::resetStateForAuto);
+    autos = new Autos(swerve);
     autoChooser.addDefaultOption("None", Commands.none());
 
     // Generates autos on connected
@@ -250,8 +261,7 @@ public class Robot extends LoggedRobot {
             () ->
                 DriverStation.isDSAttached()
                     && DriverStation.getAlliance().isPresent()
-                    && !haveAutosGenerated) // TODO check that the haveautosgenerated doesn't break
-        // anything?
+                    && !haveAutosGenerated)
         .onTrue(Commands.print("connected"))
         .onTrue(
             Commands.runOnce(() -> addAutos())
@@ -261,89 +271,11 @@ public class Robot extends LoggedRobot {
                 .ignoringDisable(true));
     SmartDashboard.putData("Add autos", Commands.runOnce(this::addAutos).ignoringDisable(true));
 
-    manualArmRezeroAlert =
-        new Alert(
-            "Arm has been manually rezeroed at least once this match. Arm cancoder may not be working!",
-            AlertType.kWarning);
-
-    driverJoystickDisconnectedAlert =
-        new Alert("Driver controller disconnected!", AlertType.kError);
-    operatorJoystickDisconnectedAlert =
-        new Alert("Operator controller disconnected!", AlertType.kError);
-
-    Logger.recordOutput(
-        "test",
-        new Pose2d(new Translation2d(), Rotation2d.k180deg.plus(Rotation2d.fromDegrees(45.0))));
-  }
-
-  private TalonFXConfiguration createRollerConfig(
-      InvertedValue inverted,
-      double currentLimit,
-      double sensorToMechanismRatio,
-      double kS,
-      double kV,
-      double kP) {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.MotorOutput.Inverted = inverted;
-    config.CurrentLimits.SupplyCurrentLimit = currentLimit;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    config.Slot0.kS = kS;
-    config.Slot0.kV = kV;
-    config.Slot0.kP = kP;
-
-    config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
-
-    return config;
-  }
-
-  private TalonFXConfiguration createPivotConfig(
-      InvertedValue inverted,
-      double supplyCurrentLimit,
-      double statorCurrentLimit,
-      double sensorToMechRatio,
-      double kV,
-      double kG,
-      double kS,
-      double kP,
-      double kI,
-      double kD) {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.MotorOutput.Inverted = inverted;
-    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-
-    config.Slot0.kV = kV;
-    config.Slot0.kG = kG;
-    config.Slot0.kS = kS;
-    config.Slot0.kP = kP;
-    config.Slot0.kI = kI;
-    config.Slot0.kD = kD;
-
-    config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-
-    config.Feedback.SensorToMechanismRatio = sensorToMechRatio;
-
-    return config;
-  }
-
-  private CANcoderConfiguration createCANcoderConfig(
-      SensorDirectionValue directionValue,
-      double MagnetOffset,
-      double AbsoluteSensorDiscontinuityPoint) {
-    CANcoderConfiguration config = new CANcoderConfiguration();
-    config.MagnetSensor.SensorDirection = directionValue;
-    config.MagnetSensor.MagnetOffset = MagnetOffset;
-    config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = AbsoluteSensorDiscontinuityPoint;
-
-    return config;
+    // Reset alert timers
+    canInitialErrorTimer.restart();
+    canErrorTimer.restart();
+    canivoreErrorTimer.restart();
+    disabledTimer.restart();
   }
 
   /** Scales a joystick value for teleop driving */
@@ -351,6 +283,7 @@ public class Robot extends LoggedRobot {
     return MathUtil.applyDeadband(Math.abs(Math.pow(val, 2)) * Math.signum(val), 0.02);
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   private void addControllerBindings() {
     // heading reset
     driver
@@ -392,6 +325,50 @@ public class Robot extends LoggedRobot {
     superstructure.periodic();
 
     // Log mechanism poses
+
+    // Check CAN status
+    var canStatus = RobotController.getCANStatus();
+    if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
+      canErrorTimer.restart();
+    }
+    canErrorAlert.set(
+        !canErrorTimer.hasElapsed(CAN_ERROR_TIME_THRESHOLD)
+            && !canInitialErrorTimer.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
+
+    // Log CANivore status
+    if (Robot.isReal()) {
+      var canivoreStatus =
+          Optional.of(canivore.getStatus()); // TODO i don't know if i'm doing the optionaling right
+      if (canivoreStatus.isPresent()) {
+        Logger.recordOutput("CANivoreStatus/Status", canivoreStatus.get().Status.getName());
+        Logger.recordOutput("CANivoreStatus/Utilization", canivoreStatus.get().BusUtilization);
+        Logger.recordOutput("CANivoreStatus/OffCount", canivoreStatus.get().BusOffCount);
+        Logger.recordOutput("CANivoreStatus/TxFullCount", canivoreStatus.get().TxFullCount);
+        Logger.recordOutput("CANivoreStatus/ReceiveErrorCount", canivoreStatus.get().REC);
+        Logger.recordOutput("CANivoreStatus/TransmitErrorCount", canivoreStatus.get().TEC);
+
+        if (!canivoreStatus.get().Status.isOK()
+            || canStatus.transmitErrorCount > 0
+            || canStatus.receiveErrorCount > 0) {
+          canivoreErrorTimer.restart();
+        }
+      }
+      // TODO i don't really like how this doesn't seem to be sticky
+      canivoreErrorAlert.set(
+          !canivoreErrorTimer.hasElapsed(CANIVORE_ERROR_TIME_THRESHOLD)
+              && !canInitialErrorTimer.hasElapsed(CAN_ERROR_TIME_THRESHOLD));
+    }
+
+    // Low battery alert
+    lowBatteryCycleCount += 1;
+    if (DriverStation.isEnabled()) {
+      disabledTimer.reset();
+    }
+    if (RobotController.getBatteryVoltage() <= lowBatteryVoltage
+        && disabledTimer.hasElapsed(lowBatteryDisabledTime)
+        && lowBatteryCycleCount >= lowBatteryMinCycleCount) {
+      lowBatteryAlert.set(true);
+    }
   }
 
   @Override

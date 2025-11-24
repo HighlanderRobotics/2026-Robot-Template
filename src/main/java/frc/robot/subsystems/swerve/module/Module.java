@@ -1,8 +1,11 @@
 package frc.robot.subsystems.swerve.module;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,16 +17,45 @@ public class Module {
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+  private final ModuleConstants constants;
+
+  // Connection alerts
+  private final Alert driveDisconnectedAlert;
+  private final Alert turnDisconnectedAlert;
+  private final Alert turnEncoderDisconnectedAlert;
+
+  // Connected debouncers
+  private final Debouncer driveMotorConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnMotorConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnEncoderConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public Module(ModuleIO io) {
     this.io = io;
+    this.constants = io.getModuleConstants();
+
+    driveDisconnectedAlert =
+        new Alert("Disconnected drive motor on " + constants.prefix + " module!", AlertType.kError);
+    turnDisconnectedAlert =
+        new Alert("Disconnected turn motor on " + constants.prefix + " module!", AlertType.kError);
+    turnEncoderDisconnectedAlert =
+        new Alert(
+            "Disconnected turn encoder on " + constants.prefix + " module!", AlertType.kError);
   }
 
   // Updates and logs the IO layer inputs
   // This class isn't a Subsystem, so periodic() needs to be called in a subsystem periodic to run
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Swerve/" + inputs.prefix + " Module", inputs);
+    Logger.processInputs("Swerve/" + constants.prefix + " Module", inputs);
+
+    // Update alerts
+    driveDisconnectedAlert.set(!driveMotorConnectedDebouncer.calculate(inputs.driveConnected));
+    turnDisconnectedAlert.set(!turnMotorConnectedDebouncer.calculate(inputs.turnConnected));
+    turnEncoderDisconnectedAlert.set(
+        !turnEncoderConnectedDebouncer.calculate(inputs.cancoderConnected));
   }
 
   public void stop() {
@@ -88,7 +120,7 @@ public class Module {
 
   /** Returns this modules prefix ie "Back Left" */
   public String getPrefix() {
-    return inputs.prefix;
+    return constants.prefix;
   }
 
   /**

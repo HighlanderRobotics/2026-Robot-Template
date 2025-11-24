@@ -23,8 +23,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
 
   @Override
   public String getName() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    return "Alpha";
   }
 
   @Override
@@ -65,6 +64,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
 
   @Override
   public double getDriveGearRatio() {
+    // sds mk4n
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getDriveGearRatio'");
   }

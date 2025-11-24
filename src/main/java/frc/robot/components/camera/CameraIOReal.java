@@ -22,6 +22,7 @@ public class CameraIOReal implements CameraIO {
 
   @Override
   public void updateInputs(CameraIOInputs inputs) {
+    inputs.connected = camera.isConnected();
     var results = camera.getAllUnreadResults();
 
     if (results.size() > 0) {

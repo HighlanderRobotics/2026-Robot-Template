@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.swerve.module.Module.ModuleConstants;
 import frc.robot.utils.MaplePhoenixUtil;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
@@ -135,8 +136,14 @@ public class ModuleIOSim implements ModuleIO {
         turnSupplyCurrent,
         turnTemp);
 
-    inputs.prefix = constants.prefix();
-
+    inputs.driveConnected =
+        BaseStatusSignal.isAllGood(
+            drivePosition,
+            driveVelocity,
+            driveAppliedVolts,
+            driveStatorCurrent,
+            driveSupplyCurrent,
+            driveTemp);
     inputs.drivePositionMeters = drivePosition.getValueAsDouble();
     inputs.driveVelocityMetersPerSec = driveVelocity.getValueAsDouble();
     inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
@@ -144,14 +151,24 @@ public class ModuleIOSim implements ModuleIO {
     inputs.driveStatorCurrentAmps = driveStatorCurrent.getValueAsDouble();
     inputs.driveSupplyCurrentAmps = driveSupplyCurrent.getValueAsDouble();
 
-    inputs.cancoderAbsolutePosition =
-        Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
+    inputs.turnConnected =
+        BaseStatusSignal.isAllGood(
+            turnPosition,
+            turnVelocity,
+            turnAppliedVolts,
+            turnStatorCurrent,
+            turnSupplyCurrent,
+            turnTemp);
     inputs.turnPosition = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
     inputs.turnVelocityRadPerSec = turnVelocity.getValue().in(RadiansPerSecond);
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnTempC = turnTemp.getValueAsDouble();
     inputs.turnStatorCurrentAmps = turnStatorCurrent.getValueAsDouble();
     inputs.turnSupplyCurrentAmps = turnSupplyCurrent.getValueAsDouble();
+
+    inputs.cancoderConnected = BaseStatusSignal.isAllGood(cancoderAbsolutePosition);
+    inputs.cancoderAbsolutePosition =
+        Rotation2d.fromRotations(cancoderAbsolutePosition.getValueAsDouble());
   }
 
   @Override
@@ -172,5 +189,10 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void setTurnPositionSetpoint(Rotation2d setpoint) {
     turnTalon.setControl(turnPID.withPosition(setpoint.getRotations()));
+  }
+
+  @Override
+  public ModuleConstants getModuleConstants() {
+    return constants;
   }
 }

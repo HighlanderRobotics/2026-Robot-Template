@@ -16,6 +16,8 @@ public interface CameraIO {
   public static class CameraIOInputs {
     public PhotonPipelineResult result = new PhotonPipelineResult();
     public boolean stale = true;
+    // stale != connected
+    public boolean connected = false;
   }
 
   public void updateInputs(CameraIOInputs inputs);

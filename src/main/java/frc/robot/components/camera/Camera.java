@@ -32,8 +32,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 /** Add your docs here. */
 public class Camera {
 
-  // TODO add doc comment about how the matrices are actually only used for sim cause i'd forgotten
-  // that!
+  // The intrinsics and distortion coefficients are only actually used for sim
   public record CameraConstants(
       String name,
       Transform3d robotToCamera,
@@ -60,6 +59,7 @@ public class Camera {
           null);
 
   private Alert futureVisionData;
+  private final Alert disconnectedAlert = new Alert(getName() + " Disconnected!", AlertType.kError);
 
   private Pose3d pose;
 
@@ -77,6 +77,9 @@ public class Camera {
   public void periodic() {
     Tracer.trace("Update inputs", this::updateInputs);
     Tracer.trace("Process april tag inputs", this::processApriltagInputs);
+
+    // TODO potentially later track nt disconnected vs completely disconnected like 6328 does?
+    disconnectedAlert.set(!inputs.connected);
   }
 
   public void updateInputs() {

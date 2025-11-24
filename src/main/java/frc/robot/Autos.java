@@ -68,8 +68,11 @@ public class Autos {
   public Autos(SwerveSubsystem swerve) {
     factory =
         new AutoFactory(
-            swerve::getPose, swerve::resetPose, swerve.choreoDriveController(), true, swerve
-            ,
+            swerve::getPose,
+            swerve::resetPose,
+            swerve.choreoDriveController(),
+            true,
+            swerve,
             (traj, edge) -> {
               if (Robot.ROBOT_TYPE != RobotType.REAL)
                 Logger.recordOutput(
@@ -78,8 +81,7 @@ public class Autos {
                             && DriverStation.getAlliance().get().equals(Alliance.Blue)
                         ? traj.getPoses()
                         : traj.flipped().getPoses());
-            }
-            );
+            });
   }
 
   // TODO write leave auto
@@ -100,7 +102,7 @@ public class Autos {
   public Command runPath(Path path, AutoRoutine routine) {
     PathEndType type = path.type;
     switch (type) {
-      default: //this should never happen
+      default: // this should never happen
         return Commands.none();
     }
   }

@@ -28,6 +28,7 @@ public class CANcoderIOReal implements CANcoderIO {
   public void updateInputs(CANcoderIOInputs inputs) {
     BaseStatusSignal.refreshAll(cancoderAbsolutePositionRotations);
 
+    inputs.connected = BaseStatusSignal.isAllGood(cancoderAbsolutePositionRotations);
     inputs.cancoderPositionRotations =
         Rotation2d.fromRotations(cancoderAbsolutePositionRotations.getValueAsDouble());
   }

@@ -7,9 +7,12 @@ package frc.robot.components.cancoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+// for cancoders that aren't on a swerve module (eg arm, intake)
 public interface CANcoderIO {
+    //TODO wherever you use this, create an alert
   @AutoLog
   public static class CANcoderIOInputs {
+    public boolean connected = false;
     public Rotation2d cancoderPositionRotations = new Rotation2d();
   }
 

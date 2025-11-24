@@ -54,6 +54,8 @@ public class CameraIOSim implements CameraIO {
 
   @Override
   public void updateInputs(CameraIOInputs inputs) {
+    // should always be connected in sim
+    inputs.connected = true;
     sim.update(poseSupplier.get());
     var results = camera.getAllUnreadResults();
     if (results.size() > 0) {
