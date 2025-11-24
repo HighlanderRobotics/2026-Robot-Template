@@ -8,20 +8,18 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Superstructure.SuperState;
+import frc.robot.Robot.RobotType;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import java.util.function.Consumer;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class Autos {
-
-  private final SwerveSubsystem swerve;
   private final AutoFactory factory;
-  private Consumer<SuperState> stateSetter;
 
   // Declare triggers
   // mehhhhhhh
@@ -67,26 +65,24 @@ public class Autos {
     }
   }
 
-  public Autos(SwerveSubsystem swerve, Consumer<SuperState> stateSetter) {
-    this.swerve = swerve;
-    this.stateSetter = stateSetter;
+  public Autos(SwerveSubsystem swerve) {
     factory =
         new AutoFactory(
             swerve::getPose, swerve::resetPose, swerve.choreoDriveController(), true, swerve
-            // ,
-            // (traj, edge) -> {
-            //   if (Robot.ROBOT_TYPE != RobotType.REAL)
-            //     Logger.recordOutput(
-            //         "Choreo/Active Traj",
-            //         DriverStation.getAlliance().isPresent()
-            //                 && DriverStation.getAlliance().get().equals(Alliance.Blue)
-            //             ? traj.getPoses()
-            //             : traj.flipped().getPoses());
-            // }
+            ,
+            (traj, edge) -> {
+              if (Robot.ROBOT_TYPE != RobotType.REAL)
+                Logger.recordOutput(
+                    "Choreo/Active Traj",
+                    DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get().equals(Alliance.Blue)
+                        ? traj.getPoses()
+                        : traj.flipped().getPoses());
+            }
             );
   }
 
-  // TODO
+  // TODO write leave auto
   public Command leaveAuto() {
     final AutoRoutine routine = factory.newRoutine("Leave Auto");
     Path[] paths = {};
@@ -104,7 +100,7 @@ public class Autos {
   public Command runPath(Path path, AutoRoutine routine) {
     PathEndType type = path.type;
     switch (type) {
-      default: // TODO this should never happen?
+      default: //this should never happen
         return Commands.none();
     }
   }

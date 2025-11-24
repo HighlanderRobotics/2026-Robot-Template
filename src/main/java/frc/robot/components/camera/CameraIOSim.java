@@ -24,12 +24,11 @@ public class CameraIOSim implements CameraIO {
   private final PhotonCamera camera;
   private final PhotonCameraSim simCamera;
 
-  public static Supplier<Pose3d> pose = () -> Pose3d.kZero; // TODO wtf
+  public final Supplier<Pose3d> poseSupplier;
 
-  public CameraIOSim(CameraConstants constants) {
+  public CameraIOSim(CameraConstants constants, Supplier<Pose3d> poseSupplier) {
     this.sim = new VisionSystemSim(constants.name());
     var cameraProp = new SimCameraProperties();
-    // TODO Fix these constants
     cameraProp.setCalibration(1080, 960, constants.intrinsicsMatrix(), constants.distCoeffs());
     cameraProp.setCalibError(0.0, 0.0);
     cameraProp.setFPS(50.0);
@@ -49,11 +48,13 @@ public class CameraIOSim implements CameraIO {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    this.poseSupplier = poseSupplier;
   }
 
   @Override
   public void updateInputs(CameraIOInputs inputs) {
-    sim.update(pose.get());
+    sim.update(poseSupplier.get());
     var results = camera.getAllUnreadResults();
     if (results.size() > 0) {
       inputs.result = results.get(results.size() - 1);
