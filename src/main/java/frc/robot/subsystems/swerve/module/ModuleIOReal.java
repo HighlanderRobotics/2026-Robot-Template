@@ -62,15 +62,15 @@ public class ModuleIOReal implements ModuleIO {
     cancoder = new CANcoder(constants.cancoderID(), "*");
 
     // Configure hardware
-    driveTalon.getConfigurator().apply(SwerveSubsystem.SWERVE_CONSTANTS.getDriveConfiguration());
+    driveTalon.getConfigurator().apply(SwerveSubsystem.SWERVE_CONSTANTS.getDriveConfig());
     turnTalon
         .getConfigurator()
-        .apply(SwerveSubsystem.SWERVE_CONSTANTS.getTurnConfiguration(constants.cancoderID()));
+        .apply(SwerveSubsystem.SWERVE_CONSTANTS.getTurnConfig(constants.cancoderID()));
 
     cancoder
         .getConfigurator()
         .apply(
-            SwerveSubsystem.SWERVE_CONSTANTS.getCancoderConfiguration(constants.cancoderOffset()));
+            SwerveSubsystem.SWERVE_CONSTANTS.getCancoderConfig(constants.cancoderOffset()));
 
     // Initialize status signals
     drivePosition = driveTalon.getPosition();

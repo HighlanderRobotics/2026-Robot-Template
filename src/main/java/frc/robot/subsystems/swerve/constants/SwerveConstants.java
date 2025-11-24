@@ -127,7 +127,7 @@ public abstract class SwerveConstants {
 
   // Hardware configurations
   /** The motor configuration for all of the drive motors */
-  public abstract TalonFXConfiguration getDriveConfiguration();
+  public abstract TalonFXConfiguration getDriveConfig();
 
   /**
    * The configuration for the turn motors, using the passed-in cancoder
@@ -135,7 +135,7 @@ public abstract class SwerveConstants {
    * @param cancoderID the cancoder attached to the motor's swerve module
    * @return the configuration
    */
-  public abstract TalonFXConfiguration getTurnConfiguration(int cancoderID);
+  public abstract TalonFXConfiguration getTurnConfig(int cancoderID);
 
   /**
    * The configuration for a swerve-module cancoder
@@ -143,7 +143,7 @@ public abstract class SwerveConstants {
    * @param cancoderOffset the offset for the specific swerve module
    * @return the configuration
    */
-  public abstract CANcoderConfiguration getCancoderConfiguration(Rotation2d cancoderOffset);
+  public abstract CANcoderConfiguration getCancoderConfig(Rotation2d cancoderOffset);
 
   public abstract double getHeadingVelocityKP();
 }

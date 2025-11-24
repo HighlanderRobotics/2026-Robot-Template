@@ -118,19 +118,19 @@ public class CompBotSwerveConstants extends SwerveConstants {
   }
 
   @Override
-  public TalonFXConfiguration getDriveConfiguration() {
+  public TalonFXConfiguration getDriveConfig() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getDriveConfiguration'");
   }
 
   @Override
-  public TalonFXConfiguration getTurnConfiguration(int cancoderID) {
+  public TalonFXConfiguration getTurnConfig(int cancoderID) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getTurnConfiguration'");
   }
 
   @Override
-  public CANcoderConfiguration getCancoderConfiguration(Rotation2d cancoderOffset) {
+  public CANcoderConfiguration getCancoderConfig(Rotation2d cancoderOffset) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'getCancoderConfiguration'");
   }

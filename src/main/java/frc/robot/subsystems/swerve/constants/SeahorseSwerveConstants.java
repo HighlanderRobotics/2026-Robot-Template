@@ -66,7 +66,7 @@ public class SeahorseSwerveConstants extends SwerveConstants {
   }
 
   @Override
-  public TalonFXConfiguration getTurnConfiguration(int cancoderID) {
+  public TalonFXConfiguration getTurnConfig(int cancoderID) {
     var turnConfig = new TalonFXConfiguration();
     // Current limits
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
@@ -98,7 +98,7 @@ public class SeahorseSwerveConstants extends SwerveConstants {
   }
 
   @Override
-  public TalonFXConfiguration getDriveConfiguration() {
+  public TalonFXConfiguration getDriveConfig() {
     var driveConfig = new TalonFXConfiguration();
     // Current limits
     driveConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
@@ -130,7 +130,7 @@ public class SeahorseSwerveConstants extends SwerveConstants {
   }
 
   @Override
-  public CANcoderConfiguration getCancoderConfiguration(Rotation2d cancoderOffset) {
+  public CANcoderConfiguration getCancoderConfig(Rotation2d cancoderOffset) {
     final var cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.MagnetOffset = cancoderOffset.getRotations();
     cancoderConfig.MagnetSensor.SensorDirection =
