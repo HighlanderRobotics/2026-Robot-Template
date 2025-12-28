@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swerve.gyro;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -47,8 +46,7 @@ public class GyroIOReal implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     BaseStatusSignal.refreshAll(yaw, pitch, roll, yawVelocity);
 
-    inputs.isConnected =
-        BaseStatusSignal.isAllGood(yaw, pitch, roll, yawVelocity);
+    inputs.isConnected = BaseStatusSignal.isAllGood(yaw, pitch, roll, yawVelocity);
     inputs.yaw = new Rotation2d(yaw.getValue());
     inputs.pitch = new Rotation2d(pitch.getValue());
     inputs.roll = new Rotation2d(roll.getValue());

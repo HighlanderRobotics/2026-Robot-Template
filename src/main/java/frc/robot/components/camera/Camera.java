@@ -40,12 +40,15 @@ public class Camera {
       Matrix<N8, N1> distCoeffs) {}
 
   // These standard deviations are used for scaling how much we "trust" a pose estimate
-  // Standard deviations are a way of measuring how far away something is from the mean. A dataset with a very high standard deviation is very spread out, versus a dataset with a low standard deviation has most of its data clustered around the mean
+  // Standard deviations are a way of measuring how far away something is from the mean. A dataset
+  // with a very high standard deviation is very spread out, versus a dataset with a low standard
+  // deviation has most of its data clustered around the mean
   // In other words, the higher the standard deviation, the greater the noise
-  // Noisy estimates are less reliable, so we can increase or decrease these standard deviation values associated with a pose estimate to reflect how reliable we think an estimate is
+  // Noisy estimates are less reliable, so we can increase or decrease these standard deviation
+  // values associated with a pose estimate to reflect how reliable we think an estimate is
   public static final Matrix<N3, N1> visionPointBlankDevs =
       new Matrix<N3, N1>(Nat.N3(), Nat.N1(), new double[] {0.6, 0.6, 0.5});
-  
+
   // infinite devs are used to show that we really don't trust this estimate
   public static final Matrix<N3, N1> infiniteDevs =
       new Matrix<N3, N1>(
@@ -65,16 +68,19 @@ public class Camera {
           null);
 
   // set up error alerts
-  private final Alert futureVisionData = new Alert(getName() + " Vision Data Coming from ✨The Future✨", AlertType.kError);
-  private final Alert disconnectedAlert = new Alert(getName() + " Disconnected!", AlertType.kError);
+  private final Alert futureVisionData;
+  private final Alert disconnectedAlert;
 
-  private Pose3d pose;
+  private Pose3d pose = Pose3d.kZero;
 
   public Camera(CameraIO io) {
     this.io = io;
     // Tells the estimator what the transformation is between the camera and the robot
     estimator.setRobotToCameraTransform(io.getCameraConstants().robotToCamera);
-    io.updateInputs(inputs);
+    // io.updateInputs(inputs);
+    futureVisionData =
+        new Alert(getName() + " Vision Data Coming from ✨The Future✨", AlertType.kError);
+    disconnectedAlert = new Alert(getName() + " Disconnected!", AlertType.kError);
   }
 
   // MUST CALL FROM SUBSYSTEM! NOT PART OF COMMAND SCHEDULER
@@ -96,7 +102,7 @@ public class Camera {
 
   public Optional<EstimatedRobotPose> update(PhotonPipelineResult result) {
 
-    //if we don't see any tags, don't return anything
+    // if we don't see any tags, don't return anything
     if (result.getTargets().size() < 1) {
       return Optional.empty();
     }
@@ -210,10 +216,5 @@ public class Camera {
 
   public Pose3d getPose() {
     return pose;
-  }
-
-  public boolean hasFrontTags() {
-    return getName().equals("Front_Left_Camera")
-        || getName().equals("Front_Right_Camera") && inputs.result.targets.size() > 0;
   }
 }

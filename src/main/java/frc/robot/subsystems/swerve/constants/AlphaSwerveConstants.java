@@ -13,7 +13,6 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -32,7 +31,7 @@ import frc.robot.subsystems.swerve.module.Module.ModuleConstants;
 /** Add your docs here. */
 public class AlphaSwerveConstants extends SwerveConstants {
 
-@Override
+  @Override
   public CameraConstants[] getCameraConstants() {
     // TODO all these numbers need to be redone :thumbsup:
     final Matrix<N3, N3> BACK_LEFT_CAMERA_MATRIX =
@@ -88,7 +87,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
             BACK_RIGHT_DIST_COEFFS);
     final CameraConstants frontRightCamConstants =
         new CameraConstants(
-            "Front_Right_Camera",
+            "Front_Right",
             new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(6.664129),
@@ -99,7 +98,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
             FRONT_RIGHT_DIST_COEFFS);
     final CameraConstants frontLeftCamConstants =
         new CameraConstants(
-            "Front_Left_Camera",
+            "Front_Left",
             new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(6.664129),
@@ -108,8 +107,10 @@ public class AlphaSwerveConstants extends SwerveConstants {
                 new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(-30))),
             FRONT_LEFT_CAMERA_MATRIX,
             FRONT_LEFT_DIST_COEFFS);
-            
-    return new CameraConstants[] {frontRightCamConstants, frontLeftCamConstants, backRightCamConstants, backLeftCamConstants};
+
+    return new CameraConstants[] {
+      frontRightCamConstants, frontLeftCamConstants, backRightCamConstants, backLeftCamConstants
+    };
   }
 
   @Override
@@ -244,7 +245,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
   @Override
   public TalonFXConfiguration getTurnConfig(int cancoderID) {
     // TODO getTurnConfig
-        var turnConfig = new TalonFXConfiguration();
+    var turnConfig = new TalonFXConfiguration();
     // Current limits
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -276,7 +277,7 @@ public class AlphaSwerveConstants extends SwerveConstants {
 
   @Override
   public CANcoderConfiguration getCancoderConfig(Rotation2d cancoderOffset) {
-        final var cancoderConfig = new CANcoderConfiguration();
+    final var cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.MagnetOffset = cancoderOffset.getRotations();
     cancoderConfig.MagnetSensor.SensorDirection =
         getTurnMotorInverted()

@@ -26,7 +26,7 @@ import frc.robot.Robot.RobotType;
 import frc.robot.components.camera.Camera;
 import frc.robot.components.camera.CameraIOReal;
 import frc.robot.components.camera.CameraIOSim;
-import frc.robot.subsystems.swerve.constants.SeahorseSwerveConstants;
+import frc.robot.subsystems.swerve.constants.AlphaSwerveConstants;
 import frc.robot.subsystems.swerve.constants.SwerveConstants;
 import frc.robot.subsystems.swerve.gyro.GyroIO;
 import frc.robot.subsystems.swerve.gyro.GyroIOInputsAutoLogged;
@@ -53,7 +53,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveSubsystem extends SubsystemBase {
-  public static final SwerveConstants SWERVE_CONSTANTS = new SeahorseSwerveConstants();
+  public static final SwerveConstants SWERVE_CONSTANTS = new AlphaSwerveConstants();
 
   private final Module[] modules; // Front Left, Front Right, Back Left, Back Right
   private final GyroIO gyroIO;
@@ -97,8 +97,6 @@ public class SwerveSubsystem extends SubsystemBase {
   private Alert usingSyncOdoAlert = new Alert("Using Sync Odometry", AlertType.kInfo);
   private Alert missingModuleData = new Alert("Missing Module Data", AlertType.kError);
   private Alert missingGyroData = new Alert("Missing Gyro Data", AlertType.kWarning);
-
-  boolean hasFrontTags = false;
 
   public SwerveSubsystem(SwerveDriveSimulation swerveSimulation) {
     if (Robot.ROBOT_TYPE == RobotType.SIM) {
@@ -293,9 +291,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   private void updateVision() {
-    hasFrontTags = false;
     for (int i = 0; i < cameras.length; i++) {
-      if (cameras[i].hasFrontTags()) hasFrontTags = true;
       cameras[i].updateCamera(estimator);
       cameraPoses[i] = cameras[i].getPose();
     }

@@ -7,7 +7,7 @@ package frc.robot.components.canrange;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface CANrangeIO {
-  //TODO wherever you use this, create an alert
+  // TODO wherever you use this, create an alert
 
   @AutoLog
   public static class CANrangeIOInputs {
