@@ -6,14 +6,12 @@ package frc.robot.components.candle;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 /** Add your docs here. */
 public interface CANdleIO {
-      @AutoLog
+  @AutoLog
   public static class CANdleIOInputs {
     public boolean connected = false;
   }
 
-    public void updateInputs(CANdleIOInputs inputs);
+  public void updateInputs(CANdleIOInputs inputs);
 }

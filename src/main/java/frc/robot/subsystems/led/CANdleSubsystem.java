@@ -4,15 +4,16 @@
 
 package frc.robot.subsystems.led;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.components.candle.CANdleIO;
+import frc.robot.components.candle.CANdleIOInputsAutoLogged;
+import org.littletonrobotics.junction.Logger;
 
 public class CANdleSubsystem extends SubsystemBase {
 
-    private final CANdleIO io;
+  private final CANdleIO io;
   private final CANdleIOInputsAutoLogged inputs = new CANdleIOInputsAutoLogged();
+
   /** Creates a new CANdleSubsystem. */
   public CANdleSubsystem(CANdleIO io) {
     this.io = io;
@@ -20,7 +21,7 @@ public class CANdleSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-        io.updateInputs(inputs);
+    io.updateInputs(inputs);
     Logger.processInputs("CANdle", inputs);
   }
 }
