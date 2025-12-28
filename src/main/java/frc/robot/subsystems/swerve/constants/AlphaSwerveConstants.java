@@ -64,13 +64,13 @@ public class AlphaSwerveConstants extends SwerveConstants {
             "Back_Left",
             new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(-11.600),
-                    Units.inchesToMeters(11.400),
-                    Units.inchesToMeters(9.052)),
+                    Units.inchesToMeters(9.859),
+                    Units.inchesToMeters(9.665),
+                    Units.inchesToMeters(-8.844)),
                 new Rotation3d(
                     Units.degreesToRadians(0.0),
-                    Units.degreesToRadians(-(90 - 76.875000)),
-                    Units.degreesToRadians(150))),
+                    Units.degreesToRadians(63.835 + 90),
+                    Units.degreesToRadians(61.875))),
             BACK_LEFT_CAMERA_MATRIX,
             BACK_LEFT_DIST_COEFFS);
     final CameraConstants backRightCamConstants =
@@ -78,11 +78,13 @@ public class AlphaSwerveConstants extends SwerveConstants {
             "Back_Right",
             new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(-11.600),
-                    Units.inchesToMeters(-11.416),
-                    Units.inchesToMeters(9.061)),
+                    Units.inchesToMeters(9.859),
+                    Units.inchesToMeters(-9.665),
+                    Units.inchesToMeters(8.844)),
                 new Rotation3d(
-                    0, Units.degreesToRadians(-(90 - 76.875000)), Units.degreesToRadians(210))),
+                    Units.degreesToRadians(0.0),
+                    Units.degreesToRadians(-90 + 61.875), // -61.875 - 45 + 90),
+                    Units.degreesToRadians(-63.835 - 90))),
             BACK_RIGHT_CAMERA_MATRIX,
             BACK_RIGHT_DIST_COEFFS);
     final CameraConstants frontRightCamConstants =
@@ -90,10 +92,13 @@ public class AlphaSwerveConstants extends SwerveConstants {
             "Front_Right",
             new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(6.664129),
-                    Units.inchesToMeters(-12.320709),
-                    Units.inchesToMeters(8.885504)),
-                new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(30))),
+                    Units.inchesToMeters(-9.859),
+                    Units.inchesToMeters(-9.665),
+                    Units.inchesToMeters(8.844)),
+                new Rotation3d(
+                    Units.degreesToRadians(0.0),
+                    Units.degreesToRadians(-90 + 61.875), // -61.875 - 45 + 90),
+                    Units.degreesToRadians(63.835 + 90 + 180))),
             FRONT_RIGHT_CAMERA_MATRIX,
             FRONT_RIGHT_DIST_COEFFS);
     final CameraConstants frontLeftCamConstants =
@@ -101,10 +106,13 @@ public class AlphaSwerveConstants extends SwerveConstants {
             "Front_Left",
             new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(6.664129),
-                    Units.inchesToMeters(12.320709),
-                    Units.inchesToMeters(8.885504)),
-                new Rotation3d(0, Units.degreesToRadians(-10), Units.degreesToRadians(-30))),
+                    Units.inchesToMeters(-9.859),
+                    Units.inchesToMeters(9.665),
+                    Units.inchesToMeters(-8.844)),
+                new Rotation3d(
+                    Units.degreesToRadians(0.0),
+                    Units.degreesToRadians(63.835),
+                    Units.degreesToRadians(61.875))),
             FRONT_LEFT_CAMERA_MATRIX,
             FRONT_LEFT_DIST_COEFFS);
 
