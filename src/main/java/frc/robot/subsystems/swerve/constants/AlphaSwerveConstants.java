@@ -205,9 +205,9 @@ public class AlphaSwerveConstants extends SwerveConstants {
   public Pigeon2Configuration getGyroConfig() {
     // TODO getGyroConfig
     Pigeon2Configuration config = new Pigeon2Configuration();
-    // config.MountPose.MountPosePitch = -0.002175945555791259;
-    // config.MountPose.MountPoseRoll = 0.120527483522892;
-    // config.MountPose.MountPoseYaw = -89.22984313964844;
+    config.MountPose.MountPosePitch = 0.18661323189735413;
+    config.MountPose.MountPoseRoll = -0.706454336643219;
+    config.MountPose.MountPoseYaw = 1.1713746786117554;
     return config;
   }
 
