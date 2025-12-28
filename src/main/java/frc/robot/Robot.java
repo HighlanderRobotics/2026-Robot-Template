@@ -196,7 +196,7 @@ public class Robot extends LoggedRobot {
     }
 
     swerve.setDefaultCommand(
-        swerve.driveOpenLoopFieldRelative(
+        swerve.driveOpenLoopRobotRelative(
             () ->
                 new ChassisSpeeds(
                         modifyJoystick(driver.getLeftY())
