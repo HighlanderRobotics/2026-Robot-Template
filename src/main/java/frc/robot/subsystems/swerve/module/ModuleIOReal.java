@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -53,13 +54,13 @@ public class ModuleIOReal implements ModuleIO {
       new VelocityTorqueCurrentFOC(0.0).withSlot(0);
   private final MotionMagicVoltage turnPID = new MotionMagicVoltage(0.0);
 
-  public ModuleIOReal(ModuleConstants moduleConstants) {
+  public ModuleIOReal(ModuleConstants moduleConstants, CANBus canbus) {
     this.constants = moduleConstants;
 
     // Initialize hardware
-    driveTalon = new TalonFX(constants.driveID(), "*");
-    turnTalon = new TalonFX(constants.turnID(), "*");
-    cancoder = new CANcoder(constants.cancoderID(), "*");
+    driveTalon = new TalonFX(constants.driveID(), canbus);
+    turnTalon = new TalonFX(constants.turnID(), canbus);
+    cancoder = new CANcoder(constants.cancoderID(), canbus);
 
     // Configure hardware
     driveTalon.getConfigurator().apply(SwerveSubsystem.SWERVE_CONSTANTS.getDriveConfig());

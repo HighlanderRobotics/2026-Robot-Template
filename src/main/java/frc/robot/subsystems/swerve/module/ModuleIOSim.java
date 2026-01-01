@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -51,13 +52,13 @@ public class ModuleIOSim implements ModuleIO {
 
   private final SwerveModuleSimulation simulation;
 
-  public ModuleIOSim(Module.ModuleConstants constants, SwerveModuleSimulation simulation) {
+  public ModuleIOSim(Module.ModuleConstants constants, SwerveModuleSimulation simulation, CANBus canbus) {
     this.constants = constants;
 
     // Initialize hardware
-    driveTalon = new TalonFX(constants.driveID(), "*");
-    turnTalon = new TalonFX(constants.turnID(), "*");
-    cancoder = new CANcoder(constants.cancoderID(), "*");
+    driveTalon = new TalonFX(constants.driveID(), canbus);
+    turnTalon = new TalonFX(constants.turnID(), canbus);
+    cancoder = new CANcoder(constants.cancoderID(), canbus);
 
     // Configure hardware
     driveTalon.getConfigurator().apply(SwerveSubsystem.SWERVE_CONSTANTS.getDriveConfig());
