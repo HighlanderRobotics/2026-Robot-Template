@@ -6,25 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import java.util.Optional;
-import java.util.Set;
-
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,6 +33,20 @@ import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.odometry.PhoenixOdometryThread;
 import frc.robot.utils.CommandXboxControllerSubsystem;
+import java.util.Optional;
+import java.util.Set;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   public static final RobotType ROBOT_TYPE = Robot.isReal() ? RobotType.REAL : RobotType.SIM;
@@ -115,7 +112,7 @@ public class Robot extends LoggedRobot {
       new SwerveDriveSimulation(driveTrainSimConfig, new Pose2d(3, 3, Rotation2d.kZero));
   // Subsystem initialization
   private final SwerveSubsystem swerve = new SwerveSubsystem(swerveSimulation, canivore);
-  private final LEDSubsystem leds = new LEDSubsystem(new LEDIOReal());
+  private final LEDSubsystem leds;
 
   private final CommandXboxControllerSubsystem driver = new CommandXboxControllerSubsystem(0);
   private final CommandXboxControllerSubsystem operator = new CommandXboxControllerSubsystem(1);
@@ -189,6 +186,8 @@ public class Robot extends LoggedRobot {
 
     PhoenixOdometryThread.getInstance().start();
 
+    leds = new LEDSubsystem(new LEDIOReal());
+
     // Set default commands
 
     driver.setDefaultCommand(driver.rumbleCmd(0.0, 0.0));
@@ -254,10 +253,9 @@ public class Robot extends LoggedRobot {
             })
         .onTrue(
             Commands.runOnce(() -> addAutos())
-                .alongWith(
-                    leds.setBlinkingCmd(() -> Color.kWhite, () -> Color.kBlack, 20.0)
-                        .withTimeout(1.0))
+                .alongWith(leds.blinkCmd(Color.kWhite, Color.kBlack, 20.0).withTimeout(1.0))
                 .ignoringDisable(true));
+    // TODO tbh idk if the leds will work here
 
     // Add autos when first connecting to DS
     new Trigger(
@@ -268,9 +266,7 @@ public class Robot extends LoggedRobot {
         .onTrue(Commands.print("connected"))
         .onTrue(
             Commands.runOnce(() -> addAutos())
-                .alongWith(
-                    leds.setBlinkingCmd(() -> Color.kWhite, () -> Color.kBlack, 20.0)
-                        .withTimeout(1.0))
+                .alongWith(leds.blinkCmd(Color.kWhite, Color.kBlack, 20.0).withTimeout(1.0))
                 .ignoringDisable(true));
     SmartDashboard.putData("Add autos", Commands.runOnce(this::addAutos).ignoringDisable(true));
 

@@ -4,103 +4,94 @@
 
 package frc.robot.subsystems.led;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
+import frc.robot.Superstructure;
 import org.littletonrobotics.junction.Logger;
 
 public class LEDSubsystem extends SubsystemBase {
-  public static final int LED_LENGTH = 59; // no one knows what this number is lmaoooo
+  public static final int LED_LENGTH = 0; //TODO tbd
   public static final int LED_ID = 0;
 
   public static final Color PURPLE = new Color("#A000D0");
 
   private final LEDIO io;
   private final LEDIOInputsAutoLogged inputs = new LEDIOInputsAutoLogged();
-  private double rainbowStart = 0;
   private double dashStart = 0;
+
+  // TODO add at extension supplier if relevant
 
   /** Creates a new LEDSubsystem. */
   public LEDSubsystem(LEDIO io) {
     this.io = io;
-    io.solid(Color.kPurple);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("LED", inputs);
+
+    if (DriverStation.isDisabled()) {
+      runAlong(
+          DriverStation.getAlliance()
+              .map((a) -> a == Alliance.Blue ? Color.kBlue : Color.kRed)
+              .orElse(Color.kWhite),
+          PURPLE,
+          4,
+          1.0);
+    } else {
+      switch (Superstructure.getState()) {
+        case IDLE:
+          solid(PURPLE);
+          break;
+          // TODO and so on
+        default:
+          solid(Color.kBlack);
+      }
+    }
   }
 
   private void setIndex(int i, Color color) {
     io.set(i, color);
   }
 
-  private void setSolid(Color color) {
+  private void solid(Color color) {
     io.solid(color);
   }
 
-  public Command setSolidCmd(Color color) {
-    return this.run(() -> setSolid(color));
+  private void solid(Color color, int start, int end) {
+    for (int i = start; i < end; i++) {
+      setIndex(i, color);
+    }
   }
 
-  public Command setBlinkingCmd(
-      Supplier<Color> onColor, Supplier<Color> offColor, double frequency) {
-    return Commands.repeatingSequence(
-        setSolidCmd(onColor.get()).withTimeout(1.0 / frequency),
-        setSolidCmd(offColor.get()).withTimeout(1.0 / frequency));
+  public void blink(Color onColor, Color offColor, double duration) {
+    blink(onColor, offColor, duration, 0, LED_LENGTH);
   }
 
-  public Command setSplitCmd(Color upper, Color lower) {
-    return this.run(
-        () -> {
-          for (int i = 0; i < LED_LENGTH; i++) {
-            io.set(i, i < LED_LENGTH / 2 ? lower : upper);
-          }
-        });
+  public void blink(Color onColor, Color offColor, double duration, int start, int end) {
+    if (Timer.getTimestamp() % (2 * duration) < duration) {
+      solid(onColor, start, end);
+    } else {
+      solid(offColor, start, end);
+    }
   }
 
-  public Command setBlinkingSplitCmd(
-      Supplier<Color> upOnColor, Supplier<Color> downOnColor, double frequency) {
-    return Commands.repeatingSequence(
-        setSplitCmd(upOnColor.get(), downOnColor.get()).withTimeout(1.0 / frequency),
-        setSolidCmd(Color.kBlack).withTimeout(1.0 / frequency));
+  public void runAlong(Color colorDash, Color colorBg, int dashLength, double frequency) {
+    solid(colorBg);
+    for (int i = (int) dashStart; i < dashStart + dashLength; i++) {
+      setIndex(i % LED_LENGTH, colorDash);
+    }
+    dashStart += LED_LENGTH * frequency * 0.020;
+    dashStart %= LED_LENGTH;
   }
 
-  /** Sets the first portion of the leds to a color, and the rest off */
-  public Command setProgressCmd(Color color, DoubleSupplier progress) {
-    return this.run(
-        () -> {
-          for (int i = 0; i < LED_LENGTH; i++) {
-            setIndex(i, i < progress.getAsDouble() * LED_LENGTH ? color : Color.kBlack);
-          }
-        });
-  }
-
-  public Command setRainbowCmd() {
-    return this.run(
-        () -> {
-          for (int i = 0; i < LED_LENGTH; i++) {
-            setIndex(i, Color.fromHSV((int) rainbowStart % 180 + i, 255, 255));
-          }
-          rainbowStart += 6;
-        });
-  }
-
-  public Command setRunAlongCmd(
-      Supplier<Color> colorDash, Color colorBg, int dashLength, double frequency) {
-    return this.run(
-        () -> {
-          setSolid(colorBg);
-          for (int i = (int) dashStart; i < dashStart + dashLength; i++) {
-            setIndex(i % LED_LENGTH, colorDash.get());
-          }
-
-          dashStart += LED_LENGTH * frequency * 0.020;
-          dashStart %= LED_LENGTH;
-        });
+  public Command blinkCmd(Color onColor, Color offColor, double duration) {
+    return Commands.run(() -> blink(onColor, offColor, duration)).repeatedly();
   }
 }

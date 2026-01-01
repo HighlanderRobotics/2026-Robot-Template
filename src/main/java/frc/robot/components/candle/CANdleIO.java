@@ -4,6 +4,7 @@
 
 package frc.robot.components.candle;
 
+import com.ctre.phoenix6.signals.RGBWColor;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -14,4 +15,8 @@ public interface CANdleIO {
   }
 
   public void updateInputs(CANdleIOInputs inputs);
+
+  public void setSolid(RGBWColor color);
+
+  public void setStrobe(RGBWColor color);
 }

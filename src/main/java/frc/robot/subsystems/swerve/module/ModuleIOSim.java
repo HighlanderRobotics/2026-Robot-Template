@@ -52,7 +52,8 @@ public class ModuleIOSim implements ModuleIO {
 
   private final SwerveModuleSimulation simulation;
 
-  public ModuleIOSim(Module.ModuleConstants constants, SwerveModuleSimulation simulation, CANBus canbus) {
+  public ModuleIOSim(
+      Module.ModuleConstants constants, SwerveModuleSimulation simulation, CANBus canbus) {
     this.constants = constants;
 
     // Initialize hardware
