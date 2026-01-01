@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 // for cancoders that aren't on a swerve module (eg arm, intake)
 public interface CANcoderIO {
-  // TODO wherever you use this, create an alert
+  // TODO wherever you use this, create an alert for connected or not
   @AutoLog
   public static class CANcoderIOInputs {
     public boolean connected = false;
