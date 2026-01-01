@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import choreo.trajectory.SwerveSample;
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -51,8 +52,6 @@ import java.util.function.Supplier;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.CANBus;
 
 public class SwerveSubsystem extends SubsystemBase {
   public static final SwerveConstants SWERVE_CONSTANTS = new AlphaSwerveConstants();
@@ -108,19 +107,23 @@ public class SwerveSubsystem extends SubsystemBase {
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getFrontLeftModuleConstants(),
-                    swerveSimulation.getModules()[0], canbus)),
+                    swerveSimulation.getModules()[0],
+                    canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getFrontRightModuleConstants(),
-                    swerveSimulation.getModules()[1], canbus)),
+                    swerveSimulation.getModules()[1],
+                    canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getBackLeftModuleConstants(),
-                    swerveSimulation.getModules()[2], canbus)),
+                    swerveSimulation.getModules()[2],
+                    canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getBackRightModuleConstants(),
-                    swerveSimulation.getModules()[3], canbus))
+                    swerveSimulation.getModules()[3],
+                    canbus))
           };
       // cameras =
       //     Arrays.stream(SWERVE_CONSTANTS.getCameraConstants())

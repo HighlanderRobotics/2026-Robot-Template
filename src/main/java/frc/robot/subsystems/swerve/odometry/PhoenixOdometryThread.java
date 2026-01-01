@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swerve.odometry;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -87,8 +86,7 @@ public class PhoenixOdometryThread extends Thread implements OdometryThreadIO {
       writeLock.lock();
 
       for (var registration : registrations) {
-        assert registration.device.getNetwork().isNetworkFD()
-            : "Only CAN FDs supported";
+        assert registration.device.getNetwork().isNetworkFD() : "Only CAN FDs supported";
         // Add each Registration to the Registered Signals array so it can be updated in the thread
         registeredSignals.addAll(
             registration.signals.stream()
