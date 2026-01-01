@@ -5,6 +5,7 @@
 package frc.robot.components.canrange;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -16,8 +17,8 @@ public class CANrangeIOReal implements CANrangeIO {
   private final StatusSignal<Distance> distance;
   private final StatusSignal<Boolean> isDetected;
 
-  public CANrangeIOReal(int CANrangeID) {
-    canrange = new CANrange(CANrangeID, "*");
+  public CANrangeIOReal(int CANrangeID, CANBus canbus) {
+    canrange = new CANrange(CANrangeID, canbus);
     distance = canrange.getDistance();
     isDetected = canrange.getIsDetected();
 

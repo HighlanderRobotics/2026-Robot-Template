@@ -52,6 +52,8 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.CANBus;
+
 public class SwerveSubsystem extends SubsystemBase {
   public static final SwerveConstants SWERVE_CONSTANTS = new AlphaSwerveConstants();
 
@@ -98,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private Alert missingModuleData = new Alert("Missing Module Data", AlertType.kError);
   private Alert missingGyroData = new Alert("Missing Gyro Data", AlertType.kWarning);
 
-  public SwerveSubsystem(SwerveDriveSimulation swerveSimulation) {
+  public SwerveSubsystem(SwerveDriveSimulation swerveSimulation, CANBus canbus) {
     if (Robot.ROBOT_TYPE == RobotType.SIM) {
       // Add simulated modules
       modules =
@@ -106,19 +108,19 @@ public class SwerveSubsystem extends SubsystemBase {
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getFrontLeftModuleConstants(),
-                    swerveSimulation.getModules()[0])),
+                    swerveSimulation.getModules()[0], canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getFrontRightModuleConstants(),
-                    swerveSimulation.getModules()[1])),
+                    swerveSimulation.getModules()[1], canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getBackLeftModuleConstants(),
-                    swerveSimulation.getModules()[2])),
+                    swerveSimulation.getModules()[2], canbus)),
             new Module(
                 new ModuleIOSim(
                     SWERVE_CONSTANTS.getBackRightModuleConstants(),
-                    swerveSimulation.getModules()[3]))
+                    swerveSimulation.getModules()[3], canbus))
           };
       // cameras =
       //     Arrays.stream(SWERVE_CONSTANTS.getCameraConstants())
@@ -135,10 +137,10 @@ public class SwerveSubsystem extends SubsystemBase {
       // Add real modules
       modules =
           new Module[] {
-            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getFrontLeftModuleConstants())),
-            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getFrontRightModuleConstants())),
-            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getBackLeftModuleConstants())),
-            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getBackRightModuleConstants()))
+            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getFrontLeftModuleConstants(), canbus)),
+            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getFrontRightModuleConstants(), canbus)),
+            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getBackLeftModuleConstants(), canbus)),
+            new Module(new ModuleIOReal(SWERVE_CONSTANTS.getBackRightModuleConstants(), canbus))
           };
       // cameras =
       //     Arrays.stream(SWERVE_CONSTANTS.getCameraConstants())
@@ -162,7 +164,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     this.gyroIO =
         Robot.ROBOT_TYPE != RobotType.SIM
-            ? new GyroIOReal(SWERVE_CONSTANTS.getGyroID(), SWERVE_CONSTANTS.getGyroConfig())
+            ? new GyroIOReal(SWERVE_CONSTANTS.getGyroID(), SWERVE_CONSTANTS.getGyroConfig(), canbus)
             : new GyroIOSim(swerveSimulation.getGyroSimulation());
 
     this.swerveSimulation = swerveSimulation;

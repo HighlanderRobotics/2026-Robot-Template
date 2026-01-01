@@ -4,6 +4,7 @@
 
 package frc.robot.components.candle;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
@@ -18,8 +19,8 @@ public class CANdleIOReal implements CANdleIO {
   private final SolidColor solidColor = new SolidColor(0, LED_LENGTH);
   private final StrobeAnimation strobe = new StrobeAnimation(0, LED_LENGTH);
 
-  public CANdleIOReal(int candleID, CANdleConfiguration config) {
-    candle = new CANdle(candleID, "*");
+  public CANdleIOReal(int candleID, CANdleConfiguration config, CANBus canbus) {
+    candle = new CANdle(candleID, canbus);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve.gyro;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -23,8 +24,8 @@ public class GyroIOReal implements GyroIO {
   private final StatusSignal<Angle> roll;
   private final StatusSignal<AngularVelocity> yawVelocity;
 
-  public GyroIOReal(int id, Pigeon2Configuration config) {
-    pigeon = new Pigeon2(id, "*");
+  public GyroIOReal(int id, Pigeon2Configuration config, CANBus canbus) {
+    pigeon = new Pigeon2(id, canbus);
 
     yaw = pigeon.getYaw();
     pitch = pigeon.getPitch();
